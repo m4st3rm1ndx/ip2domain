@@ -26,10 +26,6 @@ Fast, silent, and ideal for pentesters, bug bounty hunters, and reconnaissance w
 * Bash (Linux/macOS)
 
 
----
-
----
-
 ## **Install Requirements**
 
 Install ProjectDiscovery tools:
