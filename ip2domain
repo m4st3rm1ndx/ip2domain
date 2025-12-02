@@ -1,0 +1,102 @@
+#!/bin/bash
+# ip2domain - IP → PTR DNS → HTTP Automation Scanner
+# Author: m4st3rm1nd
+
+function show_help {
+    echo ""
+    echo " _      ______     _                   _       "
+    echo "(_)    (_____ \   | |                 (_)      "
+    echo " _ ____  ____) )_ | | ___  ____   ____ _ ____  "
+    echo "| |  _ \/_____// || |/ _ \|    \ / _  | |  _ \ "
+    echo "| | | | |_____( (_| | |_| | | | ( ( | | | | | |"
+    echo "|_| ||_(_______)____|\___/|_|_|_|\_||_|_|_| |_|"
+    echo "  |_|                                           "
+    echo ""
+    echo "                         by m4st3rm1nd"
+    echo "------------------------------------------------------------"
+    echo -e "\nUsage:"
+    echo "  $0 <ip-file>"
+    echo "  $0 -h | --help"
+    echo ""
+    echo -e "Description:"
+    echo "  Feed me an IP list → I extract PTR records → then HTTP probe them"
+    echo ""
+    echo "  ips.txt ---> dnsx (PTR) ---> ptr-output.txt ---> httpx ---> http-output.txt"
+    echo ""
+    echo "Requirements:"
+    echo "  - dnsx  (projectdiscovery)"
+    echo "  - httpx (projectdiscovery)"
+    echo ""
+    exit 0
+}
+
+# Show help
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+fi
+
+# Check input file
+if [[ -z "$1" ]]; then
+    echo -e "\n[!] Error: No IP file provided!"
+    echo "Use $0 -h for help"
+    exit 1
+fi
+
+ip_file="$1"
+output_dir="ip2domain-result"
+
+mkdir -p "$output_dir"
+
+# Banner
+echo ""
+echo " _      ______     _                   _       "
+echo "(_)    (_____ \   | |                 (_)      "
+echo " _ ____  ____) )_ | | ___  ____   ____ _ ____  "
+echo "| |  _ \/_____// || |/ _ \|    \ / _  | |  _ \ "
+echo "| | | | |_____( (_| | |_| | | | ( ( | | | | | |"
+echo "|_| ||_(_______)____|\___/|_|_|_|\_||_|_|_| |_|"
+echo "  |_|                                           "
+echo ""
+echo "                       ip2domain by m4st3rm1nd"
+echo "------------------------------------------------------------"
+
+###################################
+# Phase 1 — PTR DNS Lookup (dnsx)
+###################################
+echo -e "\033[1;34m[+] PHASE 1: PTR DNS Lookup\033[0m"
+sleep 1
+
+echo -e "[*] Running dnsx ..."
+
+dnsx -l "$ip_file" -ptr -resp-only -silent \
+    | tee "$output_dir/ptr-output.txt" >/dev/null
+
+ptr_count=$(wc -l < "$output_dir/ptr-output.txt")
+
+echo -e "\033[1;32m[+] PTR Resolved: $ptr_count records!\033[0m"
+
+###################################
+# Phase 2 — HTTP Probing (httpx)
+###################################
+echo -e "\n\033[1;34m[+] PHASE 2: HTTP Probing\033[0m"
+sleep 1
+
+echo -e "[*] Running httpx ..."
+
+cat "$output_dir/ptr-output.txt" \
+    | httpx -silent -sc -ip \
+    | tee "$output_dir/http-output.txt" >/dev/null
+
+http_count=$(wc -l < "$output_dir/http-output.txt")
+
+echo -e "\033[1;32m[+] HTTP Alive Hosts: $http_count\033[0m"
+
+###################################
+# Finished
+###################################
+echo ""
+echo -e "\033[1;36m[+] Scan Completed!\033[0m"
+echo "Output saved in:"
+echo " - $output_dir/ptr-output.txt     (PTR DNS results)"
+echo " - $output_dir/http-output.txt    (HTTP Alive Hosts)"
+echo ""
