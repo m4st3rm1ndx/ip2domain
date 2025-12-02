@@ -25,7 +25,29 @@ Fast, silent, and ideal for pentesters, bug bounty hunters, and reconnaissance w
 * `httpx` (HTTP probing)
 * Bash (Linux/macOS)
 
+
 ---
+
+---
+
+## **Install Requirements**
+
+Install ProjectDiscovery tools:
+
+```bash
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+```
+
+Make sure GOPATH/bin is in your PATH:
+
+```bash
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+---
+
+
 
 ## **Usage**
 
