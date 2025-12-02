@@ -1,7 +1,3 @@
-Sure — here is a **clean, compact, professional README** for your `ip2domain` tool:
-
----
-
 # **ip2domain**
 
 IP → PTR DNS → HTTP Detection Automation Tool
